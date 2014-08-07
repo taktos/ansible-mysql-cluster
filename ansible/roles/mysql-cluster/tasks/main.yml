@@ -1,0 +1,24 @@
+
+- get_url: dest=/vagrant/MySQL-Cluster-gpl-{{ mysql_cluster_version}}.rpm-bundle.tar url={{ mysql_cluster_download_url }}
+
+- unarchive: src=/vagrant/MySQL-Cluster-gpl-{{ mysql_cluster_version}}.rpm-bundle.tar dest=/vagrant creates=/vagrant/MySQL-Cluster-client-gpl-{{ mysql_cluster_version }}.rpm
+
+- yum: name={{ item }} state=present
+  with_items:
+    - /vagrant/MySQL-Cluster-shared-compat-gpl-{{ mysql_cluster_version }}.rpm
+    - /vagrant/MySQL-Cluster-shared-gpl-{{ mysql_cluster_version }}.rpm
+    - /vagrant/MySQL-Cluster-server-gpl-{{ mysql_cluster_version }}.rpm
+    - /vagrant/MySQL-Cluster-client-gpl-{{ mysql_cluster_version }}.rpm
+
+- copy: src=my.cnf dest=/etc/my.cnf owner=root group=root mode=0644
+- copy: src=config.ini dest=/etc/config.ini owner=root group=root mode=0644
+- file: dest=/var/lib/ndb owner=mysql group=mysql mode=0755 state=directory
+
+- command: sudo -u mysql ndb_mgmd creates=/var/lib/ndb/ndb_1.pid
+- command: sudo -u mysql ndbmtd creates=/var/lib/ndb/ndb_2.pid
+
+- service: name=mysql state=started
+
+- name: Change root user password in mysql
+  script: set_root_password.sh
+

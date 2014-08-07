@@ -1,0 +1,14 @@
+---
+- name: Install libselinux-python for SELinux
+  action: yum name=libselinux-python state=present
+
+- lineinfile: dest=/etc/yum/pluginconf.d/fastestmirror.conf insertafter="EOF" line="include_only=.jp" state=present
+
+- name: Install basic packages
+  action: yum name={{ item }} state=present
+  with_items:  basic_packages
+
+- service: name=ntpd state=started enabled=yes
+
+- selinux: policy=targeted state=permissive
+

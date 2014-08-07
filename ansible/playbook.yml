@@ -1,0 +1,6 @@
+- hosts: 127.0.0.1
+  sudo: true
+  user: vagrant
+  roles:
+    - centos-basic
+    - mysql-cluster
