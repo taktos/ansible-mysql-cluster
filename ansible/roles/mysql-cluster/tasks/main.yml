@@ -29,5 +29,8 @@
 - service: name=mysql state=started
 
 - name: Change root user password in mysql
-  script: set_root_password.sh removes=/root/.mysql_secret
+  script: set_root_password.sh {{ mysql_cluster_root_password}} removes=/root/.mysql_secret
 
+- template: src=grants.sql dest=/tmp/grants.sql mode=0644
+- name: Change root user password on remotes
+  shell: mysql -u root -p{{ mysql_cluster_root_password }} < /tmp/grants.sql
