@@ -14,11 +14,20 @@
 - copy: src=config.ini dest=/etc/config.ini owner=root group=root mode=0644
 - file: dest=/var/lib/ndb owner=mysql group=mysql mode=0755 state=directory
 
-- command: sudo -u mysql ndb_mgmd creates=/var/lib/ndb/ndb_1.pid
-- command: sudo -u mysql ndbmtd creates=/var/lib/ndb/ndb_2.pid
+- command: pgrep -x 'ndb_mgmd'
+  register: ndb_mgmd_pid
+  ignore_errors: True
+- command: pgrep -x 'ndbmtd'
+  register: ndbmtd_pid
+  ignore_errors: True
+
+- command: sudo -u mysql ndb_mgmd
+  when: ndb_mgmd_pid.rc == 1
+- command: sudo -u mysql ndbmtd
+  when: ndbmtd_pid.rc == 1
 
 - service: name=mysql state=started
 
 - name: Change root user password in mysql
-  script: set_root_password.sh
+  script: set_root_password.sh removes=/root/.mysql_secret
 
