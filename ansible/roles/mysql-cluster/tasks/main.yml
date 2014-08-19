@@ -9,6 +9,7 @@
     - /vagrant/MySQL-Cluster-shared-gpl-{{ mysql_cluster_version }}.rpm
     - /vagrant/MySQL-Cluster-server-gpl-{{ mysql_cluster_version }}.rpm
     - /vagrant/MySQL-Cluster-client-gpl-{{ mysql_cluster_version }}.rpm
+  register: mysql_cluster_installed
 
 - copy: src=my.cnf dest=/etc/my.cnf owner=root group=root mode=0644
 - copy: src=config.ini dest=/etc/config.ini owner=root group=root mode=0644
@@ -17,9 +18,11 @@
 - command: pgrep -x 'ndb_mgmd'
   register: ndb_mgmd_pid
   ignore_errors: True
+  changed_when: "ndb_mgmd_pid.rc != 0"
 - command: pgrep -x 'ndbmtd'
   register: ndbmtd_pid
   ignore_errors: True
+  changed_when: "ndbmtd_pid.rc != 0"
 
 - command: sudo -u mysql ndb_mgmd
   when: ndb_mgmd_pid.rc == 1
@@ -34,3 +37,4 @@
 - template: src=grants.sql dest=/tmp/grants.sql mode=0644
 - name: Change root user password on remotes
   shell: mysql -u root -p{{ mysql_cluster_root_password }} < /tmp/grants.sql
+  when: mysql_cluster_installed|changed
