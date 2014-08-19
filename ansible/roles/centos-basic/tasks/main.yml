@@ -12,3 +12,13 @@
 
 - selinux: policy=targeted state=permissive
 
+- name: Check timezone
+  command: date +%Z
+  register: centos_timezone
+
+- name: Copy timezone file
+  copy: src=/usr/share/zoneinfo/Asia/Tokyo dest=/etc/localtime owner=root group=root mode=0644
+  when: centos_timezone.stdout == "UTC"
+
+- name: Set timezone
+  lineinfile: dest=/etc/sysconfig/clock regexp=^ZONE= line=ZONE="Asia/Tokyo" state=present
