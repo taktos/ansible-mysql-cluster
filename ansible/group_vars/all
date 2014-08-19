@@ -9,5 +9,5 @@ basic_packages:
 
 mysql_cluster_version: 7.3.6-2.el6.x86_64
 mysql_cluster_download_url: http://dev.mysql.com/get/Downloads/MySQL-Cluster-7.3/MySQL-Cluster-gpl-{{ mysql_cluster_version }}.rpm-bundle.tar
-mysql_cluster_root_password: password
+mysql_cluster_root_password: vagrant
 
