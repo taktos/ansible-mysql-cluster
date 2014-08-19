@@ -2,7 +2,7 @@
 - name: Install libselinux-python for SELinux
   action: yum name=libselinux-python state=present
 
-- lineinfile: dest=/etc/yum/pluginconf.d/fastestmirror.conf insertafter="EOF" line="include_only=.jp" state=present
+- lineinfile: dest=/etc/yum/pluginconf.d/fastestmirror.conf insertafter="EOF" line="include_only={{ fastestmirror_include_only }}" state=present
 
 - name: Install basic packages
   action: yum name={{ item }} state=present
@@ -15,10 +15,11 @@
 - name: Check timezone
   command: date +%Z
   register: centos_timezone
+  changed_when: False
 
 - name: Copy timezone file
-  copy: src=/usr/share/zoneinfo/Asia/Tokyo dest=/etc/localtime owner=root group=root mode=0644
+  copy: src=/usr/share/zoneinfo/{{ timezone }} dest=/etc/localtime owner=root group=root mode=0644
   when: centos_timezone.stdout == "UTC"
 
 - name: Set timezone
-  lineinfile: dest=/etc/sysconfig/clock regexp=^ZONE= line=ZONE="Asia/Tokyo" state=present
+  lineinfile: dest=/etc/sysconfig/clock regexp=^ZONE= line=ZONE="{{ timezone }}" state=present

@@ -1,5 +1,6 @@
 # centos-basic
 fastestmirror_include_only: .jp
+timezone: Asia/Tokyo
 basic_packages:
   - bash-completion
   - git
